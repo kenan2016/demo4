@@ -1,5 +1,6 @@
 package mmall.demo4;
 
+import org.apache.shiro.cache.MemoryConstrainedCacheManager;
 import org.apache.shiro.mgt.SecurityManager;
 import org.apache.shiro.spring.security.interceptor.AuthorizationAttributeSourceAdvisor;
 import org.apache.shiro.spring.web.ShiroFilterFactoryBean;
@@ -60,6 +61,12 @@ public class ShiroConfiguration {
         // 另外我们怎么事项像spring security 里面的 某些接口只能被某一类角色访问呢？// 即不同角色访问不同url
         // 比如我们希望 /admin 这个接口只能 被角色为admin (这里校验的是角色名称，注意这里要把角色也要放到权限列表里、需要 实现以下)的用户访问，那么我们可以像下面写法：
         filterChainDefinitionMap.put("/admin", "roles[admin]");
+        // 典型2：必须拿到 edit权才可以进行edit操作，这样的权限控制 》》》：具有了 edit 这个perms 才能访问 /edit
+
+        ///拦截  druid/*  允许匿名请求：这个特例用来分析阿里巴巴 druid数据源中间件的性能
+        filterChainDefinitionMap.put("/druid/**","anon");
+        // 对于 druid 的学习建议读源码 DruidConfiguration
+
         //将定义好 的规则设置给  shiroFilter
         bean.setFilterChainDefinitionMap(filterChainDefinitionMap);
         return bean;
@@ -74,6 +81,8 @@ public class ShiroConfiguration {
     @Bean("authRealm")
     public AuthRealm authRealm(@Qualifier("credentialMatcher") CredentialMatcher  matcher){
         AuthRealm authRealm = new AuthRealm();
+        // 补充：使用缓存（这里的缓存是直接放到内存里的） 使用缓存以后我们所有的认证的东西都会被放到cach 里
+        authRealm.setCacheManager(new MemoryConstrainedCacheManager());
         authRealm.setCredentialsMatcher(matcher);
         return  authRealm;
     }
