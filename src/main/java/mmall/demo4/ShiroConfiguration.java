@@ -51,6 +51,15 @@ public class ShiroConfiguration {
         filterChainDefinitionMap.put("index","authc");// 这里含义是：对于index这个url 使用authc拦截器进行处理
         // 登录页面，拦截器配置
         filterChainDefinitionMap.put("/login", "anon");
+        // 如果要实现，只要登录就口可以调用其他接口的的功能？？？其实我们只要将不需要校验的接口排除出去就行了  //loginUser  接口排除出去 就行了
+        filterChainDefinitionMap.put("/loginUser", "anon");//loginUser 不需要做身份认证
+        // 登录完成后其他接口都允许访问:下面的配置的解释：  这个拦截器表示：只要登录以后，所有接口都可以被访问
+        // 可以看一下"user" 的意义  查看DefaultFilter.java
+        filterChainDefinitionMap.put("/**", "user");//即所有的请求都会被拦截并判断一下是否登录，如果未登录会被指向登录页面
+
+        // 另外我们怎么事项像spring security 里面的 某些接口只能被某一类角色访问呢？// 即不同角色访问不同url
+        // 比如我们希望 /admin 这个接口只能 被角色为admin (这里校验的是角色名称，注意这里要把角色也要放到权限列表里、需要 实现以下)的用户访问，那么我们可以像下面写法：
+        filterChainDefinitionMap.put("/admin", "roles[admin]");
         //将定义好 的规则设置给  shiroFilter
         bean.setFilterChainDefinitionMap(filterChainDefinitionMap);
         return bean;

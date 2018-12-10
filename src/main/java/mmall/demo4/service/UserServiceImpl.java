@@ -1,9 +1,8 @@
 package mmall.demo4.service;
 
-import com.mmall.demo2.mapper.UserMapper;
-import com.mmall.demo2.model.User;
+import mmall.demo4.mapper.UserMapper;
+import mmall.demo4.model.User;
 import org.springframework.stereotype.Service;
-
 import javax.annotation.Resource;
 
 @Service

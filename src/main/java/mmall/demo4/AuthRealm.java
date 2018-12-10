@@ -31,9 +31,11 @@ public class AuthRealm  extends AuthorizingRealm{
         User user = (User)principalCollection.fromRealm(this.getClass().getName()).iterator().next();
         // 获取权限列表
         List<String> permissionList = new ArrayList<>();
-        Set<Role> roleSet = user.getRoles();
+        List<String> roleNameList = new ArrayList<>();
+         Set<Role> roleSet = user.getRoles();
         if (CollectionUtils.isNotEmpty(roleSet)) {
             for (Role role : roleSet) {
+                roleNameList.add(role.getRname());
                 Set<Permission> permissionSet = role.getPermissions();
                 if (CollectionUtils.isNotEmpty(permissionSet)) {
                     for (Permission permission : permissionSet) {
@@ -43,8 +45,12 @@ public class AuthRealm  extends AuthorizingRealm{
             }
         }
         SimpleAuthorizationInfo simpleAuthorizationInfo = new SimpleAuthorizationInfo();
+        // 权限  授权
         simpleAuthorizationInfo.addStringPermissions(permissionList);
+        //角色授权
+        simpleAuthorizationInfo.addRoles(roleNameList);
 
+        // 其实是哈可以实现不同的接口使用不同的权限来控制
         return simpleAuthorizationInfo;
     }
     // 认证登录
